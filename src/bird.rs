@@ -1,5 +1,5 @@
 use quicksilver::{
-    geom::{Rectangle, Vector, Shape},
+    geom::{Rectangle, Shape},
 };
 
 const ACCEL: f32 = 1.5;
@@ -13,13 +13,13 @@ pub struct Player{
 impl Player{
     pub fn new(x: f32, y: f32) -> Self{
         Player{
-            hitbox: Rectangle::new(Vector::new(x, y), Vector::new(25.0, 25.0)),
+            hitbox: Rectangle::new((x, y), (25.0, 25.0)),
             vel: 0.0,
         }
     }
 
     pub fn update(&mut self){
-        self.hitbox = self.hitbox.translate(Vector::new(0.0, self.vel + ACCEL/2.0));
+        self.hitbox = self.hitbox.translate((0.0, self.vel + ACCEL/2.0));
         self.vel += ACCEL;
     }
 

@@ -1,18 +1,17 @@
 extern crate quicksilver;
 use quicksilver::{
-    Future, Result,
-    combinators::result,
-    geom::{Rectangle, Transform, Vector, Shape},
-    graphics::{Background, Background::Col, Color, Drawable, Font, FontStyle, Background::Img, Image},
+    Result,
+    geom::{Vector, Shape},
+    graphics::{Background, Color, Drawable, Font, FontStyle, Background::Img, Image},
     lifecycle::{Settings, State, Window, run, Event, Asset},
     input::{MouseButton, Key, ButtonState}
 };
 
-mod Bird;
-use Bird::Player;
+mod bird;
+use bird::Player;
 
-mod Pipes;
-use Pipes::PipePair;
+mod pipes;
+use pipes::PipePair;
 
 struct MainState {
     score: i32,
@@ -117,6 +116,4 @@ pub fn main(){
         vsync: true,
         ..Settings::default()
     });
-
-    println!("test");
 }
