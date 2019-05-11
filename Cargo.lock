@@ -2234,7 +2234,6 @@ dependencies = [
 name = "two-flappy"
 version = "0.1.0"
 dependencies = [
- "nalgebra 0.17.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "quicksilver 0.3.12 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
