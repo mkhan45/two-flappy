@@ -10,9 +10,13 @@ use quicksilver::{
 mod Bird;
 use Bird::Player;
 
+mod Pipes;
+use Pipes::PipePair;
+
 struct MainState {
     score: i32,
     bird: Player,
+    pipes: PipePair,
 }
 
 impl State for MainState{
@@ -20,12 +24,13 @@ impl State for MainState{
         Ok(MainState{
             score: 0,
             bird: Player::new(10.0, 200.0),
+            pipes: PipePair::new(),
         })
     }
 
     fn update(&mut self, window: &mut Window) -> Result<()> {
         self.bird.update();
-        
+        self.pipes.update();
         Ok(())
     }
 
@@ -33,6 +38,8 @@ impl State for MainState{
         window.clear(Color::WHITE)?;
 
         window.draw(&self.bird.hitbox, Background::Col(Color::BLACK));
+        window.draw(&self.pipes.hitboxes.0, Background::Col(Color::BLACK));
+        window.draw(&self.pipes.hitboxes.1, Background::Col(Color::BLACK));
 
         Ok(())
     }
