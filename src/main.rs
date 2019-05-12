@@ -7,6 +7,10 @@ use quicksilver::{
     input::{MouseButton, Key, ButtonState}
 };
 
+#[macro_use]
+extern crate stdweb;
+use stdweb::js;
+
 mod bird;
 use bird::Player;
 
@@ -54,15 +58,22 @@ impl State for MainState{
         self.pipes.update();
 
         if self.bird.hitbox.overlaps(&self.pipes.hitboxes.0) || self.bird.hitbox.overlaps(&self.pipes.hitboxes.1){
-            println!("dead");
+            js!{ @(no_return)
+                document.title = @{self.score} + " - Dead";
+            }
             self.alive = false;
         }
 
-        if self.bird.hitbox.x() == self.pipes.hitboxes.0.x(){
+        if self.bird.hitbox.x() == self.pipes.hitboxes.0.x() && self.alive{
             self.score += 1;
 
             let score = format!("Score: {}", self.score);
             let font_style =  FontStyle::new(48.0, Color::BLACK);
+
+            js!{ @(no_return)
+                document.title = @{self.score};
+            }
+
 
             let mut text_renderer = Asset::new(Font::load("OpenSans-Regular.ttf"));
 
@@ -110,7 +121,7 @@ impl State for MainState{
 }
 
 pub fn main(){
-    run::<MainState>("N-body Gravity Sim", Vector::new(1000, 800), Settings {
+    run::<MainState>("Two-Flappy", Vector::new(1000, 800), Settings {
         draw_rate: 1.0,  //draw as fast as possible basically
         update_rate: 1000. / 30., 
         vsync: true,

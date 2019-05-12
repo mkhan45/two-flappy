@@ -2235,6 +2235,7 @@ name = "two-flappy"
 version = "0.1.0"
 dependencies = [
  "quicksilver 0.3.12 (registry+https://github.com/rust-lang/crates.io-index)",
+ "stdweb 0.4.17 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
