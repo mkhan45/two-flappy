@@ -60,7 +60,7 @@ impl State for MainState{
         if self.bird.hitbox.overlaps(&self.pipes.hitboxes.0) || self.bird.hitbox.overlaps(&self.pipes.hitboxes.1)
             || self.bird.hitbox.x() == self.pipes.hitboxes.0.x() && self.bird.hitbox.y() <= -5.0
             || self.bird.hitbox.y() >= 805.0
-            || self.pipes.gap > MAX_GAP{
+            || self.pipes.gap > MAX_GAP/2.0{
                 js!{ @(no_return)
                     document.title = @{self.pipes.score} + " - Dead";
                 }
