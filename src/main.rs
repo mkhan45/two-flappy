@@ -57,21 +57,21 @@ impl State for MainState{
         self.bird.update();
         self.pipes.update();
 
-        if self.bird.hitbox.overlaps(&self.pipes.hitboxes.0) || self.bird.hitbox.overlaps(&self.pipes.hitboxes.1){
-            js!{ @(no_return)
-                document.title = @{self.score} + " - Dead";
+        if self.bird.hitbox.overlaps(&self.pipes.hitboxes.0) || self.bird.hitbox.overlaps(&self.pipes.hitboxes.1)
+            || self.bird.hitbox.x() == self.pipes.hitboxes.0.x() && (self.bird.hitbox.y() <= -5.0){
+                js!{ @(no_return)
+                    document.title = @{self.pipes.score} + " - Dead";
+                }
+                self.alive = false;
             }
-            self.alive = false;
-        }
 
-        if self.bird.hitbox.x() == self.pipes.hitboxes.0.x() && self.alive{
-            self.score += 1;
+        if self.pipes.hitboxes.0.x() <= 0.0 && self.alive{
 
-            let score = format!("Score: {}", self.score);
+            let score = format!("Score: {}", self.pipes.score);
             let font_style =  FontStyle::new(48.0, Color::BLACK);
 
             js!{ @(no_return)
-                document.title = @{self.score};
+                document.title = @{self.pipes.score};
             }
 
 
