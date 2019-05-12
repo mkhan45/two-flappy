@@ -88,6 +88,10 @@ impl State for MainState{
             }).expect("error font");
         }
 
+        if window.keyboard()[Key::W].is_down(){
+            self.pipes.jump();
+        }
+
         Ok(())
     }
 
