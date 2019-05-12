@@ -98,9 +98,13 @@ impl State for MainState{
     fn draw(&mut self, window: &mut Window) -> Result<()> {
         window.clear(Color::WHITE)?;
 
+        let hurtboxes_color = Background::Col(Color::from_rgba(255, 0, 0, 0.25));
+
         window.draw(&self.bird.hitbox, Background::Col(Color::BLACK));
         window.draw(&self.pipes.hitboxes.0, Background::Col(Color::BLACK));
         window.draw(&self.pipes.hitboxes.1, Background::Col(Color::BLACK));
+        window.draw(&self.pipes.hurtboxes.0, hurtboxes_color);
+        window.draw(&self.pipes.hurtboxes.1, hurtboxes_color);
 
         match &self.score_img{
             Some(img) => window.draw(&img.area(), Img(&img)),

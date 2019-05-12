@@ -10,9 +10,11 @@ use rand;
 const WIDTH: f32 = 100.0;
 const INIT_GAP: f32 = 200.0;
 const GAP_ACCEL: f32 = -0.85;
+const MAX_GAP: f32 = 400.0;
 
 pub struct PipePair{
     pub hitboxes: (Rectangle, Rectangle),
+    pub hurtboxes: (Rectangle, Rectangle),
     pub center_y: f32,
     pub gap: f32,
     pub vel: f32,
@@ -25,8 +27,12 @@ impl PipePair{
         let top = Rectangle::new((1000.0, 0.0), (WIDTH, 300.0));
         let bottom = Rectangle::new((1000.0, INIT_GAP), (WIDTH, 300.0));
 
+        let top_h = Rectangle::new((0.0, 0.0), (1000.0, MAX_GAP/2.0));
+        let bottom_h = Rectangle::new((0.0, 600.0), (1000.0, MAX_GAP/2.0));
+
         PipePair{
             hitboxes: (top, bottom),
+            hurtboxes: (top_h, bottom_h),
             center_y: 400.0,
             gap: INIT_GAP,
             vel: 0.0,
@@ -73,8 +79,12 @@ impl PipePair{
             let top = Rectangle::new( (1000.0, 0.0), (WIDTH, self.center_y - INIT_GAP));
             let bottom = Rectangle::new( (1000.0, self.center_y + INIT_GAP), (WIDTH, self.center_y) );
 
+            let top_h = Rectangle::new( (0.0, 0.0), (1000.0, self.center_y - MAX_GAP/2.0));
+            let bottom_h = Rectangle::new( (0.0, self.center_y + MAX_GAP/2.0), (1000.0, self.center_y + 500.0) );
+
             self.gap = INIT_GAP;
             self.hitboxes = (top, bottom);
+            self.hurtboxes = (top_h, bottom_h);
 
             self.speed *= 1.0 + (30.0 - self.speed)/300.0;
             self.score += 1;
