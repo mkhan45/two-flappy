@@ -30,7 +30,7 @@ struct MainState {
 impl State for MainState{
     fn new() -> Result<Self> {
 
-        let mut state = MainState{
+        let state = MainState{
             bird: Player::new(10.0, 200.0),
             pipes: PipePair::new(),
             alive: true,
@@ -57,10 +57,11 @@ impl State for MainState{
         self.bird.update();
         self.pipes.update();
 
-        if self.bird.hitbox.overlaps(&self.pipes.hitboxes.0) || self.bird.hitbox.overlaps(&self.pipes.hitboxes.1)
+        if (self.bird.hitbox.overlaps(&self.pipes.hitboxes.0) || self.bird.hitbox.overlaps(&self.pipes.hitboxes.1)
             || self.bird.hitbox.x() == self.pipes.hitboxes.0.x() && self.bird.hitbox.y() <= -5.0
             || self.bird.hitbox.y() >= 805.0
-            || self.pipes.gap > MAX_GAP/2.0{
+            || self.pipes.gap > MAX_GAP/2.0)
+            && self.alive{
                 js!{ @(no_return)
                     document.title = @{self.pipes.score} + " - Dead";
                 }
@@ -90,10 +91,6 @@ impl State for MainState{
 //             }).expect("error font");
         }
 
-        if window.keyboard()[Key::W].is_down(){
-            self.pipes.jump();
-        }
-
         Ok(())
     }
 
@@ -121,6 +118,15 @@ impl State for MainState{
             Event::MouseButton(btn, state) => {
                 if btn == &MouseButton::Left && state == &ButtonState::Pressed && self.alive{
                     self.bird.jump();
+                }
+            },
+
+            Event::Key(btn, state) => {
+                if state == &ButtonState::Pressed{
+                    match btn{
+                        Key::W => self.pipes.jump(),
+                        _ => {},
+                    };
                 }
             },
 

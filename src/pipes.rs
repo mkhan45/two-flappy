@@ -101,6 +101,6 @@ impl PipePair{
     }
 
     pub fn jump(&mut self){
-        self.vel += 5.0;
+        self.vel += 10.0;
     }
 }
