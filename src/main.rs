@@ -17,6 +17,8 @@ use bird::Player;
 mod pipes;
 use pipes::PipePair;
 
+const MAX_GAP: f32 = 400.0;
+
 struct MainState {
     bird: Player,
     pipes: PipePair,
@@ -56,34 +58,36 @@ impl State for MainState{
         self.pipes.update();
 
         if self.bird.hitbox.overlaps(&self.pipes.hitboxes.0) || self.bird.hitbox.overlaps(&self.pipes.hitboxes.1)
-            || self.bird.hitbox.x() == self.pipes.hitboxes.0.x() && (self.bird.hitbox.y() <= -5.0){
-                // js!{ @(no_return)
-                //     document.title = @{self.pipes.score} + " - Dead";
-                // }
-                // self.alive = false;
+            || self.bird.hitbox.x() == self.pipes.hitboxes.0.x() && self.bird.hitbox.y() <= -5.0
+            || self.bird.hitbox.y() >= 805.0
+            || self.pipes.gap > MAX_GAP{
+                js!{ @(no_return)
+                    document.title = @{self.pipes.score} + " - Dead";
+                }
+                self.alive = false;
             }
 
         if self.pipes.hitboxes.0.x() <= 0.0 && self.alive{
 
-            let score = format!("Score: {}", self.pipes.score);
-            let font_style =  FontStyle::new(48.0, Color::BLACK);
+            // let score = format!("Score: {}", self.pipes.score);
+            // let font_style =  FontStyle::new(48.0, Color::BLACK);
 
-            // js!{ @(no_return)
-            //     document.title = @{self.pipes.score};
-            // }
+            js!{ @(no_return)
+                document.title = @{self.pipes.score};
+            }
 
 
-            let mut text_renderer = Asset::new(Font::load("OpenSans-Regular.ttf"));
+//             let mut text_renderer = Asset::new(Font::load("OpenSans-Regular.ttf"));
 
-            text_renderer.execute(|font| {
-                let image = font.render(&score, &font_style);
-                match image{
-                    Ok(img) => self.score_img = Some(img),
-                    Err(_e) => println!("error loading font"),
-                }
+//             text_renderer.execute(|font| {
+//                 let image = font.render(&score, &font_style);
+//                 match image{
+//                     Ok(img) => self.score_img = Some(img),
+//                     Err(_e) => println!("error loading font"),
+//                 }
 
-                Ok(())
-            }).expect("error font");
+//                 Ok(())
+//             }).expect("error font");
         }
 
         if window.keyboard()[Key::W].is_down(){
