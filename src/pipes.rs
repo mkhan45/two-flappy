@@ -1,5 +1,5 @@
-use stdweb;
-use stdweb::js;
+// use stdweb;
+// use stdweb::js;
 
 use quicksilver::{
     geom::{Rectangle, Shape},
@@ -11,6 +11,7 @@ const WIDTH: f32 = 100.0;
 const INIT_GAP: f32 = 200.0;
 const GAP_ACCEL: f32 = -0.85;
 const MAX_GAP: f32 = 400.0;
+const HURTBOX_SPEED: f32 = 1.5;
 
 pub struct PipePair{
     pub hitboxes: (Rectangle, Rectangle),
@@ -20,11 +21,12 @@ pub struct PipePair{
     pub vel: f32,
     pub speed: f32,
     pub score: u32,
+    pub hurtbox_vel: f32,
 }
 
 impl PipePair{
     pub fn new() -> Self{
-        let top = Rectangle::new((1000.0, 0.0), (WIDTH, 300.0));
+        let top = Rectangle::new((1000.0, -200.0), (WIDTH, 500.0));
         let bottom = Rectangle::new((1000.0, INIT_GAP), (WIDTH, 300.0));
 
         let top_h = Rectangle::new((0.0, 0.0), (1000.0, MAX_GAP/2.0));
@@ -38,6 +40,7 @@ impl PipePair{
             vel: 0.0,
             speed: 10.0,
             score: 1,
+            hurtbox_vel: HURTBOX_SPEED,
         }
     }
 
@@ -72,19 +75,25 @@ impl PipePair{
             let top = Rectangle::new((self.hitboxes.0.x() - self.speed, 0.0), (WIDTH, self.center_y - self.gap));
             let bottom = Rectangle::new( (self.hitboxes.0.x() - self.speed, self.center_y + self.gap), (WIDTH, self.center_y + 500.0) );
 
-            self.hitboxes = (top, bottom);
-
-        }else {
-            self.center_y = rand::random::<f32>() * 400.0 + 200.0;
-            let top = Rectangle::new( (1000.0, 0.0), (WIDTH, self.center_y - INIT_GAP));
-            let bottom = Rectangle::new( (1000.0, self.center_y + INIT_GAP), (WIDTH, self.center_y) );
+            self.center_y += self.hurtbox_vel;
 
             let top_h = Rectangle::new( (0.0, 0.0), (1000.0, self.center_y - MAX_GAP/2.0));
             let bottom_h = Rectangle::new( (0.0, self.center_y + MAX_GAP/2.0), (1000.0, self.center_y + 500.0) );
+            
+            if bottom_h.y() >= 800.0 { self.hurtbox_vel *= -1.0 };
+            if top_h.y() + top_h.height() <= 0.0 { self.hurtbox_vel *= -1.0 };
+
+            self.hurtboxes = (top_h, bottom_h);
+            self.hitboxes = (top, bottom);
+
+        }else {
+            let top = Rectangle::new( (1000.0, 0.0), (WIDTH, self.center_y - INIT_GAP));
+            let bottom = Rectangle::new( (1000.0, self.center_y + INIT_GAP), (WIDTH, self.center_y) );
+
+
 
             self.gap = INIT_GAP;
             self.hitboxes = (top, bottom);
-            self.hurtboxes = (top_h, bottom_h);
 
             self.speed *= 1.0 + (30.0 - self.speed)/300.0;
             self.score += 1;

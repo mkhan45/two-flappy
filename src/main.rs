@@ -18,7 +18,6 @@ mod pipes;
 use pipes::PipePair;
 
 struct MainState {
-    score: i32,
     bird: Player,
     pipes: PipePair,
     alive: bool,
@@ -30,25 +29,24 @@ impl State for MainState{
     fn new() -> Result<Self> {
 
         let mut state = MainState{
-            score: 0,
             bird: Player::new(10.0, 200.0),
             pipes: PipePair::new(),
             alive: true,
             score_img: None,
         };
 
-        let mut text_renderer = Asset::new(Font::load("OpenSans-Regular.ttf"));
-        let font_style =  FontStyle::new(48.0, Color::BLACK);
+        // let mut text_renderer = Asset::new(Font::load("OpenSans-Regular.ttf"));
+        // let font_style =  FontStyle::new(48.0, Color::BLACK);
 
-        text_renderer.execute(|font| {
-            let image = font.render("Score: 0", &font_style);
-            match image{
-                Ok(img) => state.score_img = Some(img),
-                Err(_e) => println!("error loading font"),
-            }
+        // text_renderer.execute(|font| {
+        //     let image = font.render("Score: 0", &font_style);
+        //     match image{
+        //         Ok(img) => state.score_img = Some(img),
+        //         Err(_e) => println!("error loading font"),
+        //     }
 
-            Ok(())
-        }).expect("error font");
+        //     Ok(())
+        // }).expect("error font");
 
         Ok(state)
     }
@@ -59,10 +57,10 @@ impl State for MainState{
 
         if self.bird.hitbox.overlaps(&self.pipes.hitboxes.0) || self.bird.hitbox.overlaps(&self.pipes.hitboxes.1)
             || self.bird.hitbox.x() == self.pipes.hitboxes.0.x() && (self.bird.hitbox.y() <= -5.0){
-                js!{ @(no_return)
-                    document.title = @{self.pipes.score} + " - Dead";
-                }
-                self.alive = false;
+                // js!{ @(no_return)
+                //     document.title = @{self.pipes.score} + " - Dead";
+                // }
+                // self.alive = false;
             }
 
         if self.pipes.hitboxes.0.x() <= 0.0 && self.alive{
@@ -70,9 +68,9 @@ impl State for MainState{
             let score = format!("Score: {}", self.pipes.score);
             let font_style =  FontStyle::new(48.0, Color::BLACK);
 
-            js!{ @(no_return)
-                document.title = @{self.pipes.score};
-            }
+            // js!{ @(no_return)
+            //     document.title = @{self.pipes.score};
+            // }
 
 
             let mut text_renderer = Asset::new(Font::load("OpenSans-Regular.ttf"));
