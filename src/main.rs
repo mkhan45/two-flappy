@@ -17,8 +17,6 @@ use bird::Player;
 mod pipes;
 use pipes::PipePair;
 
-const MAX_GAP: f32 = 400.0;
-
 struct MainState {
     bird: Player,
     pipes: PipePair,
@@ -31,7 +29,7 @@ impl State for MainState{
     fn new() -> Result<Self> {
 
         let state = MainState{
-            bird: Player::new(10.0, 200.0),
+            bird: Player::new(20.0, 200.0),
             pipes: PipePair::new(),
             alive: true,
             score_img: None,
@@ -54,41 +52,43 @@ impl State for MainState{
     }
 
     fn update(&mut self, window: &mut Window) -> Result<()> {
-        self.bird.update();
-        self.pipes.update();
+        if self.alive{
+            self.bird.update();
+            self.pipes.update();
 
-        if (self.bird.hitbox.overlaps(&self.pipes.hitboxes.0) || self.bird.hitbox.overlaps(&self.pipes.hitboxes.1)
-            || self.bird.hitbox.x() == self.pipes.hitboxes.0.x() && self.bird.hitbox.y() <= -5.0
-            || self.bird.hitbox.y() >= 805.0
-            || self.pipes.gap > MAX_GAP/2.0)
-            && self.alive{
-                js!{ @(no_return)
-                    document.title = @{self.pipes.score} + " - Dead";
+            if (self.bird.hitbox.overlaps(&self.pipes.hitboxes.0) || self.bird.hitbox.overlaps(&self.pipes.hitboxes.1)
+                || self.bird.hitbox.x() == self.pipes.hitboxes.0.x() && self.bird.hitbox.y() <= -5.0
+                || self.bird.hitbox.y() >= 805.0
+                || self.pipes.gap > self.pipes.max_gap/2.0)
+                && self.alive{
+                    js!{ @(no_return)
+                        document.title = @{self.pipes.score} + " - Dead";
+                    }
+                    self.alive = false;
                 }
-                self.alive = false;
-            }
 
-        if self.pipes.hitboxes.0.x() <= 0.0 && self.alive{
+            if self.pipes.hitboxes.0.x() <= 0.0 && self.alive{
 
-            // let score = format!("Score: {}", self.pipes.score);
-            // let font_style =  FontStyle::new(48.0, Color::BLACK);
+                // let score = format!("Score: {}", self.pipes.score);
+                // let font_style =  FontStyle::new(48.0, Color::BLACK);
 
-            js!{ @(no_return)
-                document.title = @{self.pipes.score};
-            }
+                js!{ @(no_return)
+                    document.title = @{self.pipes.score};
+                }
 
 
-//             let mut text_renderer = Asset::new(Font::load("OpenSans-Regular.ttf"));
+                //             let mut text_renderer = Asset::new(Font::load("OpenSans-Regular.ttf"));
 
-//             text_renderer.execute(|font| {
-//                 let image = font.render(&score, &font_style);
-//                 match image{
-//                     Ok(img) => self.score_img = Some(img),
-//                     Err(_e) => println!("error loading font"),
+                //             text_renderer.execute(|font| {
+                //                 let image = font.render(&score, &font_style);
+                //                 match image{
+                //                     Ok(img) => self.score_img = Some(img),
+                //                     Err(_e) => println!("error loading font"),
 //                 }
 
 //                 Ok(())
 //             }).expect("error font");
+            }
         }
 
         Ok(())
@@ -100,8 +100,8 @@ impl State for MainState{
         let hurtboxes_color = Background::Col(Color::from_rgba(255, 0, 0, 0.25));
 
         window.draw(&self.bird.hitbox, Background::Col(Color::BLACK));
-        window.draw(&self.pipes.hitboxes.0, Background::Col(Color::BLACK));
-        window.draw(&self.pipes.hitboxes.1, Background::Col(Color::BLACK));
+        window.draw(&self.pipes.hitboxes.0, Background::Col(Color::GREEN));
+        window.draw(&self.pipes.hitboxes.1, Background::Col(Color::BLUE));
         window.draw(&self.pipes.hurtboxes.0, hurtboxes_color);
         window.draw(&self.pipes.hurtboxes.1, hurtboxes_color);
 

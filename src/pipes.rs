@@ -5,12 +5,9 @@ use quicksilver::{
     geom::{Rectangle, Shape},
 };
 
-use rand;
-
 const WIDTH: f32 = 100.0;
 const INIT_GAP: f32 = 200.0;
 const GAP_ACCEL: f32 = -0.85;
-const MAX_GAP: f32 = 400.0;
 const HURTBOX_SPEED: f32 = 1.5;
 
 pub struct PipePair{
@@ -22,6 +19,7 @@ pub struct PipePair{
     pub speed: f32,
     pub score: u32,
     pub hurtbox_vel: f32,
+    pub max_gap: f32,
 }
 
 impl PipePair{
@@ -29,8 +27,8 @@ impl PipePair{
         let top = Rectangle::new((1000.0, -200.0), (WIDTH, 500.0));
         let bottom = Rectangle::new((1000.0, INIT_GAP), (WIDTH, 300.0));
 
-        let top_h = Rectangle::new((0.0, 0.0), (1000.0, MAX_GAP/2.0));
-        let bottom_h = Rectangle::new((0.0, 600.0), (1000.0, MAX_GAP/2.0));
+        let top_h = Rectangle::new((0.0, 0.0), (1000.0, 400.0/2.0));
+        let bottom_h = Rectangle::new((0.0, 600.0), (1000.0, 400.0/2.0));
 
         PipePair{
             hitboxes: (top, bottom),
@@ -41,6 +39,7 @@ impl PipePair{
             speed: 10.0,
             score: 1,
             hurtbox_vel: HURTBOX_SPEED,
+            max_gap: 400.0,
         }
     }
 
@@ -77,8 +76,8 @@ impl PipePair{
 
             self.center_y += self.hurtbox_vel;
 
-            let top_h = Rectangle::new( (0.0, 0.0), (1000.0, self.center_y - MAX_GAP/2.0));
-            let bottom_h = Rectangle::new( (0.0, self.center_y + MAX_GAP/2.0), (1000.0, self.center_y + 500.0) );
+            let top_h = Rectangle::new( (0.0, 0.0), (1000.0, self.center_y - self.max_gap/2.0));
+            let bottom_h = Rectangle::new( (0.0, self.center_y + self.max_gap/2.0), (1000.0, self.center_y + 500.0) );
             
             if bottom_h.y() >= 800.0 { self.hurtbox_vel *= -1.0 };
             if top_h.y() + top_h.height() <= 0.0 { self.hurtbox_vel *= -1.0 };
@@ -95,7 +94,9 @@ impl PipePair{
             self.gap = INIT_GAP;
             self.hitboxes = (top, bottom);
 
-            self.speed *= 1.0 + (30.0 - self.speed)/300.0;
+            self.speed *= 1.0 + (30.0 - self.speed)/300.0; //logistic I think
+            self.max_gap *= 0.95;
+            if self.gap >= self.max_gap/2.0 {self.gap = self.max_gap/2.0 * 0.95};
             self.score += 1;
         }
     }
