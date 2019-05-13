@@ -115,16 +115,24 @@ impl State for MainState{
 
     fn event(&mut self, event: &Event, _window: &mut Window) -> Result<()> {
         match event{
-            Event::MouseButton(btn, state) => {
-                if btn == &MouseButton::Left && state == &ButtonState::Pressed && self.alive{
-                    self.bird.jump();
-                }
-            },
+            // Event::MouseButton(btn, state) => {
+            //     if btn == &MouseButton::Left && state == &ButtonState::Pressed && self.alive{
+            //         self.bird.jump();
+            //     }
+            // },
 
             Event::Key(btn, state) => {
                 if state == &ButtonState::Pressed{
                     match btn{
                         Key::W => self.pipes.jump(),
+                        Key::Up => self.bird.jump(),
+                        Key::R => {
+                            self.bird = Player::new(20.0, 200.0);
+                            self.pipes = PipePair::new();
+                            self.alive = true;
+                            self.score_img = None;
+                        },
+
                         _ => {},
                     };
                 }
