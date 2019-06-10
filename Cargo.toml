@@ -7,3 +7,6 @@ edition = "2018"
 [dependencies]
 quicksilver = "0.3.8"
 stdweb = "0.4.17"
+
+[profile.release]
+opt-level = "s"

@@ -17,13 +17,14 @@ use bird::Player;
 mod pipes;
 use pipes::PipePair;
 
+use stdweb::unstable::TryInto;
+
 struct MainState {
     bird: Player,
     pipes: PipePair,
     alive: bool,
     score_img: Option<Image>,
 }
-
 
 impl State for MainState{
     fn new() -> Result<Self> {
@@ -52,9 +53,13 @@ impl State for MainState{
     }
 
     fn update(&mut self, window: &mut Window) -> Result<()> {
+        js!{
+            js_update();
+        }
         if self.alive{
             self.bird.update();
             self.pipes.update();
+
 
             if (self.bird.hitbox.overlaps(&self.pipes.hitboxes.0) || self.bird.hitbox.overlaps(&self.pipes.hitboxes.1)
                 || self.bird.hitbox.x() == self.pipes.hitboxes.0.x() && self.bird.hitbox.y() <= -5.0
@@ -75,21 +80,54 @@ impl State for MainState{
                 js!{ @(no_return)
                     document.title = @{self.pipes.score};
                 }
-
-
-                //             let mut text_renderer = Asset::new(Font::load("OpenSans-Regular.ttf"));
-
-                //             text_renderer.execute(|font| {
-                //                 let image = font.render(&score, &font_style);
-                //                 match image{
-                //                     Ok(img) => self.score_img = Some(img),
-                //                     Err(_e) => println!("error loading font"),
-//                 }
-
-//                 Ok(())
-//             }).expect("error font");
             }
         }
+
+        let socket_jump: bool = js!{
+            if(socket_jump)
+                return true;
+            else
+                return false;
+        }.try_into().unwrap();
+
+        let socket_pipe: bool = js!{
+            if(socket_pipe)
+                return true;
+            else
+                return false;
+        }.try_into().unwrap();
+
+        let socket_reset: bool = js!{
+            if(socket_reset)
+                return true;
+            else
+                return false;
+        }.try_into().unwrap();
+
+        if socket_jump{
+            self.bird.jump();
+            js!{
+                socket_jump = false;
+            }
+        }
+
+        if socket_pipe{
+            self.pipes.jump();
+            js!{
+                socket_pipe = false;
+            }
+        }
+
+        if socket_reset{
+            self.bird = Player::new(20.0, 200.0);
+            self.pipes = PipePair::new();
+            self.alive = true;
+            self.score_img = None;
+            js!{
+                socket_reset = false;
+            }
+        }
+
 
         Ok(())
     }
@@ -99,11 +137,11 @@ impl State for MainState{
 
         let hurtboxes_color = Background::Col(Color::from_rgba(255, 0, 0, 0.25));
 
-        window.draw(&self.bird.hitbox, Background::Col(Color::BLACK));
         window.draw(&self.pipes.hitboxes.0, Background::Col(Color::GREEN));
         window.draw(&self.pipes.hitboxes.1, Background::Col(Color::BLUE));
         window.draw(&self.pipes.hurtboxes.0, hurtboxes_color);
         window.draw(&self.pipes.hurtboxes.1, hurtboxes_color);
+        window.draw(&self.bird.hitbox, Background::Col(Color::BLACK));
 
         match &self.score_img{
             Some(img) => window.draw(&img.area(), Img(&img)),
@@ -126,11 +164,18 @@ impl State for MainState{
                     match btn{
                         Key::W => self.pipes.jump(),
                         Key::Up => self.bird.jump(),
+                        Key::S => {js!{socket_jump_queue = true}; ()},
+                        Key::F => {js!{socket_pipe_queue = true}; ()},
                         Key::R => {
                             self.bird = Player::new(20.0, 200.0);
                             self.pipes = PipePair::new();
                             self.alive = true;
                             self.score_img = None;
+                        },
+                        Key::N => {
+                            js!{
+                                socket_reset_queue = true;
+                            }
                         },
 
                         _ => {},
@@ -151,4 +196,12 @@ pub fn main(){
         vsync: true,
         ..Settings::default()
     });
+}
+
+#[js_export]
+pub fn test_js() -> u32{
+    js!{
+        console.log("worked");
+    };
+    5
 }
